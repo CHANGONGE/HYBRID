@@ -1,0 +1,55 @@
+@import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bottom-nav-height: 64px;
+  --safe-area-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+html {
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+body {
+  font-family: 'Pretendard', system-ui, sans-serif;
+  overscroll-behavior: none;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* 하단 네비게이션 높이만큼 콘텐츠 패딩 */
+.page-content {
+  padding-bottom: calc(var(--bottom-nav-height) + var(--safe-area-bottom) + 16px);
+}
+
+/* 안전 영역 대응 */
+.safe-bottom {
+  padding-bottom: calc(var(--safe-area-bottom) + 64px);
+}
+
+/* 스크롤바 숨김 (모바일) */
+.hide-scrollbar::-webkit-scrollbar { display: none; }
+.hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+/* KPI 카드 그라디언트 */
+.kpi-blue { background: linear-gradient(135deg, #3b82f6, #2563eb); }
+.kpi-green { background: linear-gradient(135deg, #10b981, #059669); }
+.kpi-orange { background: linear-gradient(135deg, #f59e0b, #d97706); }
+.kpi-red { background: linear-gradient(135deg, #ef4444, #dc2626); }
+.kpi-purple { background: linear-gradient(135deg, #8b5cf6, #7c3aed); }
+
+/* 탭 활성 상태 */
+.tab-active { color: #2563eb; }
+.tab-inactive { color: #9ca3af; }
+
+/* 카드 호버 */
+.card-hover { transition: all 0.2s ease; }
+.card-hover:active { transform: scale(0.98); opacity: 0.9; }
+
+/* 다크모드 */
+@media (prefers-color-scheme: dark) {
+  .auto-dark { background-color: #1f2937; color: #f9fafb; }
+}
