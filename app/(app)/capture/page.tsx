@@ -28,12 +28,42 @@ export default function CapturePage() {
       return;
     }
 
-    // 미리보기
+    // 미리보기 + 자동 OCR
     const reader = new FileReader();
-    reader.onload = (e) => setImagePreview(e.target?.result as string);
+    reader.onload = async (e) => {
+      const base64 = e.target?.result as string;
+      setImagePreview(base64);
+      // 자동 OCR 실행
+      setIsOcrRunning(true);
+      try {
+        const ocrRes = await fetch("/api/ocr", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ imageBase64: base64 }),
+        });
+        if (ocrRes.ok) {
+          const ocrData = await ocrRes.json();
+          const result = ocrData.result;
+          setInitialFormData({
+            업체명: result.업체명 || "",
+            날짜: result.날짜 || new Date().toISOString().slice(0, 10),
+            금액: result.금액 || 0,
+            통화: result.통화 || "KRW",
+            승인번호: result.승인번호 || "",
+          });
+          setFormKey((k) => k + 1);
+          setOcrDone(true);
+          toast.success("정보가 자동 추출되었습니다. 확인 후 수정하세요.");
+        }
+      } catch {
+        // OCR 실패 시 무시 (수동 입력 가능)
+      } finally {
+        setIsOcrRunning(false);
+      }
+    };
     reader.readAsDataURL(file);
 
-    // Supabase 업로드
+    // Supabase 업로드 (백그라운드)
     setIsUploading(true);
     try {
       const formData = new FormData();
@@ -43,7 +73,6 @@ export default function CapturePage() {
       const data = await res.json();
       setImageUrl(data.url);
       setOcrDone(false);
-      toast.success("이미지가 업로드되었습니다.");
     } catch (error) {
       toast.error("이미지 업로드에 실패했습니다.");
     } finally {
