@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Expense, Category, Currency } from "@/types";
 
 const CATEGORIES: Category[] = [
@@ -12,7 +12,7 @@ const CURRENCIES: Currency[] = [
 ];
 
 const CARDS = [
-  "법인카드A", "법인카드B", "개인카드", "기타",
+  "법인카드A", "법인카드B", "개인카드(신한)", "개인카드(국민)", "현금",
 ];
 
 export type ExpenseFormData = Omit<Expense, "id" | "등록자" | "한도초과" | "한도태그">;
@@ -23,6 +23,7 @@ interface ExpenseFormProps {
   onCancel: () => void;
   submitLabel?: string;
   isLoading?: boolean;
+  onFormReady?: (setField: <K extends keyof ExpenseFormData>(key: K, value: ExpenseFormData[K]) => void) => void;
 }
 
 export function ExpenseForm({
@@ -31,6 +32,7 @@ export function ExpenseForm({
   onCancel,
   submitLabel = "저장",
   isLoading = false,
+  onFormReady,
 }: ExpenseFormProps) {
   const today = new Date().toISOString().slice(0, 10);
 
@@ -48,6 +50,11 @@ export function ExpenseForm({
   });
 
   const [errors, setErrors] = useState<Partial<Record<keyof ExpenseFormData, string>>>({});
+
+  useEffect(() => {
+    if (onFormReady) onFormReady(setField);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   function validate(): boolean {
     const newErrors: Partial<Record<keyof ExpenseFormData, string>> = {};
